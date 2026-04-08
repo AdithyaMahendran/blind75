@@ -1,0 +1,1633 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Blind 75 – Java Solutions</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Segoe UI', system-ui, sans-serif;
+      background: #0f172a;
+      color: #e2e8f0;
+      min-height: 100vh;
+      padding: 24px 16px;
+    }
+    h1 {
+      text-align: center;
+      font-size: 2rem;
+      font-weight: 700;
+      color: #f8fafc;
+      margin-bottom: 8px;
+    }
+    .subtitle {
+      text-align: center;
+      color: #94a3b8;
+      margin-bottom: 32px;
+      font-size: 0.95rem;
+    }
+    .filters {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      justify-content: center;
+      margin-bottom: 28px;
+    }
+    .filter-btn {
+      padding: 6px 18px;
+      border-radius: 999px;
+      border: 1px solid #334155;
+      background: #1e293b;
+      color: #94a3b8;
+      cursor: pointer;
+      font-size: 0.85rem;
+      transition: all .2s;
+    }
+    .filter-btn:hover, .filter-btn.active {
+      background: #3b82f6;
+      border-color: #3b82f6;
+      color: #fff;
+    }
+    .progress-bar-wrap {
+      max-width: 700px;
+      margin: 0 auto 28px;
+    }
+    .progress-label {
+      font-size: 0.85rem;
+      color: #94a3b8;
+      margin-bottom: 6px;
+      text-align: right;
+    }
+    .progress-bar-bg {
+      background: #1e293b;
+      border-radius: 999px;
+      height: 8px;
+      overflow: hidden;
+    }
+    .progress-bar-fill {
+      height: 100%;
+      background: linear-gradient(90deg, #3b82f6, #8b5cf6);
+      border-radius: 999px;
+      transition: width .4s;
+    }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+      gap: 20px;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+    .card {
+      background: #1e293b;
+      border: 1px solid #334155;
+      border-radius: 14px;
+      overflow: hidden;
+      transition: box-shadow .2s, border-color .2s;
+    }
+    .card:hover {
+      border-color: #3b82f6;
+      box-shadow: 0 0 0 2px rgba(59,130,246,.2);
+    }
+    .card-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 16px 18px 12px;
+      cursor: pointer;
+      user-select: none;
+    }
+    .card-num {
+      font-size: 0.75rem;
+      font-weight: 700;
+      color: #64748b;
+      min-width: 28px;
+    }
+    .card-title {
+      flex: 1;
+      font-weight: 600;
+      font-size: 0.97rem;
+      color: #f1f5f9;
+    }
+    .badge {
+      font-size: 0.72rem;
+      font-weight: 600;
+      padding: 2px 10px;
+      border-radius: 999px;
+      text-transform: uppercase;
+      letter-spacing: .04em;
+    }
+    .badge-easy   { background: #052e16; color: #4ade80; border: 1px solid #166534; }
+    .badge-medium { background: #431407; color: #fb923c; border: 1px solid #9a3412; }
+    .badge-hard   { background: #450a0a; color: #f87171; border: 1px solid #991b1b; }
+    .tag {
+      font-size: 0.7rem;
+      padding: 2px 8px;
+      border-radius: 999px;
+      background: #0f172a;
+      color: #7dd3fc;
+      border: 1px solid #1e3a5f;
+    }
+    .card-question {
+      padding: 0 18px 14px;
+      font-size: 0.875rem;
+      color: #cbd5e1;
+      line-height: 1.6;
+    }
+    .card-actions {
+      padding: 0 18px 14px;
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+    .btn-solution {
+      padding: 6px 16px;
+      border-radius: 8px;
+      border: none;
+      background: #2563eb;
+      color: #fff;
+      font-size: 0.82rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background .2s;
+    }
+    .btn-solution:hover { background: #1d4ed8; }
+    .btn-solved {
+      padding: 5px 14px;
+      border-radius: 8px;
+      border: 1px solid #166534;
+      background: transparent;
+      color: #4ade80;
+      font-size: 0.78rem;
+      cursor: pointer;
+      transition: all .2s;
+      margin-left: auto;
+    }
+    .btn-solved.done {
+      background: #052e16;
+    }
+    .solution-block {
+      display: none;
+      background: #0f172a;
+      border-top: 1px solid #1e293b;
+      padding: 16px 18px;
+    }
+    .solution-block.visible { display: block; }
+    .solution-block h4 {
+      font-size: 0.8rem;
+      font-weight: 700;
+      color: #60a5fa;
+      text-transform: uppercase;
+      letter-spacing: .06em;
+      margin-bottom: 10px;
+    }
+    pre {
+      font-family: 'Cascadia Code', 'Fira Code', 'Consolas', monospace;
+      font-size: 0.78rem;
+      line-height: 1.65;
+      color: #e2e8f0;
+      overflow-x: auto;
+      white-space: pre;
+    }
+    .complexity {
+      display: flex;
+      gap: 16px;
+      margin-top: 12px;
+      font-size: 0.75rem;
+      color: #94a3b8;
+    }
+    .complexity span b { color: #facc15; }
+    .hidden { display: none !important; }
+    @media (max-width: 520px) {
+      .grid { grid-template-columns: 1fr; }
+      h1 { font-size: 1.5rem; }
+    }
+  </style>
+</head>
+<body>
+
+<h1>Blind 75 – Java Solutions</h1>
+<p class="subtitle">75 essential LeetCode problems with detailed Java solutions</p>
+
+<div class="progress-bar-wrap">
+  <p class="progress-label" id="progressLabel">0 / 75 solved</p>
+  <div class="progress-bar-bg"><div class="progress-bar-fill" id="progressFill" style="width:0%"></div></div>
+</div>
+
+<div class="filters">
+  <button class="filter-btn active" onclick="filterCategory('All')">All</button>
+  <button class="filter-btn" onclick="filterCategory('Array')">Array</button>
+  <button class="filter-btn" onclick="filterCategory('String')">String</button>
+  <button class="filter-btn" onclick="filterCategory('Tree')">Tree</button>
+  <button class="filter-btn" onclick="filterCategory('Graph')">Graph</button>
+  <button class="filter-btn" onclick="filterCategory('DP')">Dynamic Programming</button>
+  <button class="filter-btn" onclick="filterCategory('LinkedList')">Linked List</button>
+  <button class="filter-btn" onclick="filterCategory('Interval')">Interval</button>
+  <button class="filter-btn" onclick="filterCategory('Matrix')">Matrix</button>
+  <button class="filter-btn" onclick="filterCategory('Heap')">Heap</button>
+  <button class="filter-btn" onclick="filterCategory('Binary')">Binary</button>
+</div>
+
+<div class="grid" id="cardGrid"></div>
+
+<script>
+const problems = [
+  // ── ARRAY ──────────────────────────────────────────────────────────────────
+  {
+    num: 1, title: "Two Sum", difficulty: "Easy", category: "Array",
+    question: "Given an array of integers <code>nums</code> and an integer <code>target</code>, return indices of the two numbers such that they add up to <code>target</code>.",
+    solution: `class Solution {
+    public int[] twoSum(int[] nums, int target) {
+        Map<Integer, Integer> map = new HashMap<>();
+        for (int i = 0; i < nums.length; i++) {
+            int complement = target - nums[i];
+            if (map.containsKey(complement))
+                return new int[]{ map.get(complement), i };
+            map.put(nums[i], i);
+        }
+        return new int[]{};
+    }
+}`, tc: "O(n)", sc: "O(n)"
+  },
+  {
+    num: 2, title: "Best Time to Buy and Sell Stock", difficulty: "Easy", category: "Array",
+    question: "Given an array <code>prices</code> where <code>prices[i]</code> is the price on day <code>i</code>, return the maximum profit from one buy/sell transaction.",
+    solution: `class Solution {
+    public int maxProfit(int[] prices) {
+        int minPrice = Integer.MAX_VALUE, maxProfit = 0;
+        for (int price : prices) {
+            minPrice = Math.min(minPrice, price);
+            maxProfit = Math.max(maxProfit, price - minPrice);
+        }
+        return maxProfit;
+    }
+}`, tc: "O(n)", sc: "O(1)"
+  },
+  {
+    num: 3, title: "Contains Duplicate", difficulty: "Easy", category: "Array",
+    question: "Given an integer array <code>nums</code>, return <code>true</code> if any value appears at least twice.",
+    solution: `class Solution {
+    public boolean containsDuplicate(int[] nums) {
+        Set<Integer> seen = new HashSet<>();
+        for (int n : nums)
+            if (!seen.add(n)) return true;
+        return false;
+    }
+}`, tc: "O(n)", sc: "O(n)"
+  },
+  {
+    num: 4, title: "Product of Array Except Self", difficulty: "Medium", category: "Array",
+    question: "Return an array <code>output</code> where <code>output[i]</code> equals the product of all elements except <code>nums[i]</code>, without using division.",
+    solution: `class Solution {
+    public int[] productExceptSelf(int[] nums) {
+        int n = nums.length;
+        int[] res = new int[n];
+        res[0] = 1;
+        for (int i = 1; i < n; i++)
+            res[i] = res[i-1] * nums[i-1];
+        int right = 1;
+        for (int i = n-1; i >= 0; i--) {
+            res[i] *= right;
+            right  *= nums[i];
+        }
+        return res;
+    }
+}`, tc: "O(n)", sc: "O(1)"
+  },
+  {
+    num: 5, title: "Maximum Subarray", difficulty: "Medium", category: "Array",
+    question: "Given integer array <code>nums</code>, find the contiguous subarray with the largest sum and return its sum. (Kadane's Algorithm)",
+    solution: `class Solution {
+    public int maxSubArray(int[] nums) {
+        int maxSum = nums[0], cur = nums[0];
+        for (int i = 1; i < nums.length; i++) {
+            cur = Math.max(nums[i], cur + nums[i]);
+            maxSum = Math.max(maxSum, cur);
+        }
+        return maxSum;
+    }
+}`, tc: "O(n)", sc: "O(1)"
+  },
+  {
+    num: 6, title: "Maximum Product Subarray", difficulty: "Medium", category: "Array",
+    question: "Find the contiguous subarray with the largest product.",
+    solution: `class Solution {
+    public int maxProduct(int[] nums) {
+        int maxP = nums[0], minP = nums[0], res = nums[0];
+        for (int i = 1; i < nums.length; i++) {
+            int tmpMax = maxP;
+            maxP = Math.max(nums[i], Math.max(maxP * nums[i], minP * nums[i]));
+            minP = Math.min(nums[i], Math.min(tmpMax * nums[i], minP * nums[i]));
+            res  = Math.max(res, maxP);
+        }
+        return res;
+    }
+}`, tc: "O(n)", sc: "O(1)"
+  },
+  {
+    num: 7, title: "Find Minimum in Rotated Sorted Array", difficulty: "Medium", category: "Array",
+    question: "Given a rotated sorted array of unique elements, return the minimum element.",
+    solution: `class Solution {
+    public int findMin(int[] nums) {
+        int lo = 0, hi = nums.length - 1;
+        while (lo < hi) {
+            int mid = lo + (hi - lo) / 2;
+            if (nums[mid] > nums[hi]) lo = mid + 1;
+            else                      hi = mid;
+        }
+        return nums[lo];
+    }
+}`, tc: "O(log n)", sc: "O(1)"
+  },
+  {
+    num: 8, title: "Search in Rotated Sorted Array", difficulty: "Medium", category: "Array",
+    question: "Search for a target value in a rotated sorted array. Return its index or -1.",
+    solution: `class Solution {
+    public int search(int[] nums, int target) {
+        int lo = 0, hi = nums.length - 1;
+        while (lo <= hi) {
+            int mid = lo + (hi - lo) / 2;
+            if (nums[mid] == target) return mid;
+            if (nums[lo] <= nums[mid]) {
+                if (nums[lo] <= target && target < nums[mid]) hi = mid - 1;
+                else lo = mid + 1;
+            } else {
+                if (nums[mid] < target && target <= nums[hi]) lo = mid + 1;
+                else hi = mid - 1;
+            }
+        }
+        return -1;
+    }
+}`, tc: "O(log n)", sc: "O(1)"
+  },
+  {
+    num: 9, title: "3Sum", difficulty: "Medium", category: "Array",
+    question: "Find all unique triplets in the array that sum to zero.",
+    solution: `class Solution {
+    public List<List<Integer>> threeSum(int[] nums) {
+        List<List<Integer>> res = new ArrayList<>();
+        Arrays.sort(nums);
+        for (int i = 0; i < nums.length - 2; i++) {
+            if (i > 0 && nums[i] == nums[i-1]) continue;
+            int lo = i+1, hi = nums.length-1;
+            while (lo < hi) {
+                int s = nums[i] + nums[lo] + nums[hi];
+                if (s == 0) {
+                    res.add(Arrays.asList(nums[i], nums[lo], nums[hi]));
+                    while (lo < hi && nums[lo] == nums[lo+1]) lo++;
+                    while (lo < hi && nums[hi] == nums[hi-1]) hi--;
+                    lo++; hi--;
+                } else if (s < 0) lo++;
+                else hi--;
+            }
+        }
+        return res;
+    }
+}`, tc: "O(n²)", sc: "O(n)"
+  },
+  {
+    num: 10, title: "Container With Most Water", difficulty: "Medium", category: "Array",
+    question: "Given heights of vertical lines, find two lines that form a container holding the most water.",
+    solution: `class Solution {
+    public int maxArea(int[] height) {
+        int lo = 0, hi = height.length - 1, max = 0;
+        while (lo < hi) {
+            max = Math.max(max, Math.min(height[lo], height[hi]) * (hi - lo));
+            if (height[lo] < height[hi]) lo++;
+            else hi--;
+        }
+        return max;
+    }
+}`, tc: "O(n)", sc: "O(1)"
+  },
+
+  // ── STRING ─────────────────────────────────────────────────────────────────
+  {
+    num: 11, title: "Longest Substring Without Repeating Characters", difficulty: "Medium", category: "String",
+    question: "Given a string, find the length of the longest substring without repeating characters.",
+    solution: `class Solution {
+    public int lengthOfLongestSubstring(String s) {
+        Map<Character, Integer> map = new HashMap<>();
+        int max = 0, left = 0;
+        for (int right = 0; right < s.length(); right++) {
+            char c = s.charAt(right);
+            if (map.containsKey(c))
+                left = Math.max(left, map.get(c) + 1);
+            map.put(c, right);
+            max = Math.max(max, right - left + 1);
+        }
+        return max;
+    }
+}`, tc: "O(n)", sc: "O(min(m,n))"
+  },
+  {
+    num: 12, title: "Longest Repeating Character Replacement", difficulty: "Medium", category: "String",
+    question: "Given a string and integer k, find the length of the longest substring containing the same letter after replacing at most k characters.",
+    solution: `class Solution {
+    public int characterReplacement(String s, int k) {
+        int[] count = new int[26];
+        int maxCount = 0, left = 0, res = 0;
+        for (int right = 0; right < s.length(); right++) {
+            maxCount = Math.max(maxCount, ++count[s.charAt(right)-'A']);
+            while ((right - left + 1) - maxCount > k)
+                count[s.charAt(left++)-'A']--;
+            res = Math.max(res, right - left + 1);
+        }
+        return res;
+    }
+}`, tc: "O(n)", sc: "O(1)"
+  },
+  {
+    num: 13, title: "Minimum Window Substring", difficulty: "Hard", category: "String",
+    question: "Given strings s and t, return the minimum window substring of s that contains all characters of t.",
+    solution: `class Solution {
+    public String minWindow(String s, String t) {
+        Map<Character,Integer> need = new HashMap<>(), window = new HashMap<>();
+        for (char c : t.toCharArray()) need.merge(c, 1, Integer::sum);
+        int left = 0, valid = 0, start = 0, minLen = Integer.MAX_VALUE;
+        for (int right = 0; right < s.length(); right++) {
+            char c = s.charAt(right);
+            window.merge(c, 1, Integer::sum);
+            if (need.containsKey(c) && window.get(c).equals(need.get(c))) valid++;
+            while (valid == need.size()) {
+                if (right - left + 1 < minLen) { start = left; minLen = right - left + 1; }
+                char d = s.charAt(left++);
+                if (need.containsKey(d) && window.get(d).equals(need.get(d))) valid--;
+                window.merge(d, -1, Integer::sum);
+            }
+        }
+        return minLen == Integer.MAX_VALUE ? "" : s.substring(start, start + minLen);
+    }
+}`, tc: "O(n+m)", sc: "O(m)"
+  },
+  {
+    num: 14, title: "Valid Anagram", difficulty: "Easy", category: "String",
+    question: "Determine if string <code>t</code> is an anagram of string <code>s</code>.",
+    solution: `class Solution {
+    public boolean isAnagram(String s, String t) {
+        if (s.length() != t.length()) return false;
+        int[] count = new int[26];
+        for (char c : s.toCharArray()) count[c-'a']++;
+        for (char c : t.toCharArray()) if (--count[c-'a'] < 0) return false;
+        return true;
+    }
+}`, tc: "O(n)", sc: "O(1)"
+  },
+  {
+    num: 15, title: "Group Anagrams", difficulty: "Medium", category: "String",
+    question: "Group strings that are anagrams of each other.",
+    solution: `class Solution {
+    public List<List<String>> groupAnagrams(String[] strs) {
+        Map<String, List<String>> map = new HashMap<>();
+        for (String s : strs) {
+            char[] ca = s.toCharArray();
+            Arrays.sort(ca);
+            map.computeIfAbsent(new String(ca), k -> new ArrayList<>()).add(s);
+        }
+        return new ArrayList<>(map.values());
+    }
+}`, tc: "O(n·k log k)", sc: "O(n·k)"
+  },
+  {
+    num: 16, title: "Valid Parentheses", difficulty: "Easy", category: "String",
+    question: "Given a string of brackets, determine if it is valid (open brackets closed in correct order).",
+    solution: `class Solution {
+    public boolean isValid(String s) {
+        Deque<Character> stack = new ArrayDeque<>();
+        for (char c : s.toCharArray()) {
+            if (c=='(' || c=='{' || c=='[') stack.push(c);
+            else if (stack.isEmpty()) return false;
+            else {
+                char top = stack.pop();
+                if (c==')' && top!='(') return false;
+                if (c=='}' && top!='{') return false;
+                if (c==']' && top!='[') return false;
+            }
+        }
+        return stack.isEmpty();
+    }
+}`, tc: "O(n)", sc: "O(n)"
+  },
+  {
+    num: 17, title: "Valid Palindrome", difficulty: "Easy", category: "String",
+    question: "A phrase is palindrome if it reads the same forward and backward, ignoring non-alphanumeric characters and case.",
+    solution: `class Solution {
+    public boolean isPalindrome(String s) {
+        int lo = 0, hi = s.length() - 1;
+        while (lo < hi) {
+            while (lo < hi && !Character.isLetterOrDigit(s.charAt(lo))) lo++;
+            while (lo < hi && !Character.isLetterOrDigit(s.charAt(hi))) hi--;
+            if (Character.toLowerCase(s.charAt(lo)) !=
+                Character.toLowerCase(s.charAt(hi))) return false;
+            lo++; hi--;
+        }
+        return true;
+    }
+}`, tc: "O(n)", sc: "O(1)"
+  },
+  {
+    num: 18, title: "Longest Palindromic Substring", difficulty: "Medium", category: "String",
+    question: "Given a string, find the longest palindromic substring.",
+    solution: `class Solution {
+    public String longestPalindrome(String s) {
+        String res = "";
+        for (int i = 0; i < s.length(); i++) {
+            // odd
+            String odd = expand(s, i, i);
+            if (odd.length() > res.length()) res = odd;
+            // even
+            String even = expand(s, i, i+1);
+            if (even.length() > res.length()) res = even;
+        }
+        return res;
+    }
+    private String expand(String s, int l, int r) {
+        while (l >= 0 && r < s.length() && s.charAt(l) == s.charAt(r)) { l--; r++; }
+        return s.substring(l+1, r);
+    }
+}`, tc: "O(n²)", sc: "O(1)"
+  },
+  {
+    num: 19, title: "Palindromic Substrings", difficulty: "Medium", category: "String",
+    question: "Count the number of palindromic substrings in a string.",
+    solution: `class Solution {
+    public int countSubstrings(String s) {
+        int count = 0;
+        for (int i = 0; i < s.length(); i++) {
+            count += expand(s, i, i);    // odd
+            count += expand(s, i, i+1);  // even
+        }
+        return count;
+    }
+    private int expand(String s, int l, int r) {
+        int c = 0;
+        while (l >= 0 && r < s.length() && s.charAt(l--) == s.charAt(r++)) c++;
+        return c;
+    }
+}`, tc: "O(n²)", sc: "O(1)"
+  },
+  {
+    num: 20, title: "Encode and Decode Strings", difficulty: "Medium", category: "String",
+    question: "Design an algorithm to encode/decode a list of strings to a single string sent over the network.",
+    solution: `public class Codec {
+    public String encode(List<String> strs) {
+        StringBuilder sb = new StringBuilder();
+        for (String s : strs) sb.append(s.length()).append('#').append(s);
+        return sb.toString();
+    }
+    public List<String> decode(String s) {
+        List<String> res = new ArrayList<>();
+        int i = 0;
+        while (i < s.length()) {
+            int j = s.indexOf('#', i);
+            int len = Integer.parseInt(s.substring(i, j));
+            res.add(s.substring(j+1, j+1+len));
+            i = j + 1 + len;
+        }
+        return res;
+    }
+}`, tc: "O(n)", sc: "O(n)"
+  },
+
+  // ── TREE ───────────────────────────────────────────────────────────────────
+  {
+    num: 21, title: "Maximum Depth of Binary Tree", difficulty: "Easy", category: "Tree",
+    question: "Find the maximum depth (number of nodes along the longest root-to-leaf path) of a binary tree.",
+    solution: `class Solution {
+    public int maxDepth(TreeNode root) {
+        if (root == null) return 0;
+        return 1 + Math.max(maxDepth(root.left), maxDepth(root.right));
+    }
+}`, tc: "O(n)", sc: "O(h)"
+  },
+  {
+    num: 22, title: "Same Tree", difficulty: "Easy", category: "Tree",
+    question: "Given the roots of two binary trees, check if they are structurally identical and have the same node values.",
+    solution: `class Solution {
+    public boolean isSameTree(TreeNode p, TreeNode q) {
+        if (p == null && q == null) return true;
+        if (p == null || q == null) return false;
+        return p.val == q.val
+            && isSameTree(p.left,  q.left)
+            && isSameTree(p.right, q.right);
+    }
+}`, tc: "O(n)", sc: "O(h)"
+  },
+  {
+    num: 23, title: "Invert Binary Tree", difficulty: "Easy", category: "Tree",
+    question: "Invert (mirror) a binary tree.",
+    solution: `class Solution {
+    public TreeNode invertTree(TreeNode root) {
+        if (root == null) return null;
+        TreeNode tmp    = root.left;
+        root.left       = invertTree(root.right);
+        root.right      = invertTree(tmp);
+        return root;
+    }
+}`, tc: "O(n)", sc: "O(h)"
+  },
+  {
+    num: 24, title: "Binary Tree Level Order Traversal", difficulty: "Medium", category: "Tree",
+    question: "Return the level-order traversal of a binary tree's nodes' values (from left to right, level by level).",
+    solution: `class Solution {
+    public List<List<Integer>> levelOrder(TreeNode root) {
+        List<List<Integer>> res = new ArrayList<>();
+        if (root == null) return res;
+        Queue<TreeNode> q = new LinkedList<>();
+        q.offer(root);
+        while (!q.isEmpty()) {
+            int size = q.size();
+            List<Integer> level = new ArrayList<>();
+            for (int i = 0; i < size; i++) {
+                TreeNode n = q.poll();
+                level.add(n.val);
+                if (n.left  != null) q.offer(n.left);
+                if (n.right != null) q.offer(n.right);
+            }
+            res.add(level);
+        }
+        return res;
+    }
+}`, tc: "O(n)", sc: "O(n)"
+  },
+  {
+    num: 25, title: "Subtree of Another Tree", difficulty: "Easy", category: "Tree",
+    question: "Given roots of two trees <code>root</code> and <code>subRoot</code>, return true if there is a subtree of root that is identical to subRoot.",
+    solution: `class Solution {
+    public boolean isSubtree(TreeNode root, TreeNode subRoot) {
+        if (root == null) return false;
+        if (isSame(root, subRoot)) return true;
+        return isSubtree(root.left, subRoot) || isSubtree(root.right, subRoot);
+    }
+    private boolean isSame(TreeNode a, TreeNode b) {
+        if (a == null && b == null) return true;
+        if (a == null || b == null) return false;
+        return a.val == b.val && isSame(a.left, b.left) && isSame(a.right, b.right);
+    }
+}`, tc: "O(n·m)", sc: "O(h)"
+  },
+  {
+    num: 26, title: "Construct Binary Tree from Preorder and Inorder Traversal", difficulty: "Medium", category: "Tree",
+    question: "Build a binary tree from its preorder and inorder traversal arrays.",
+    solution: `class Solution {
+    int preIdx = 0;
+    Map<Integer,Integer> inMap = new HashMap<>();
+    public TreeNode buildTree(int[] preorder, int[] inorder) {
+        for (int i = 0; i < inorder.length; i++) inMap.put(inorder[i], i);
+        return build(preorder, 0, inorder.length - 1);
+    }
+    private TreeNode build(int[] pre, int lo, int hi) {
+        if (lo > hi) return null;
+        int val = pre[preIdx++];
+        TreeNode node = new TreeNode(val);
+        int mid = inMap.get(val);
+        node.left  = build(pre, lo, mid - 1);
+        node.right = build(pre, mid + 1, hi);
+        return node;
+    }
+}`, tc: "O(n)", sc: "O(n)"
+  },
+  {
+    num: 27, title: "Validate Binary Search Tree", difficulty: "Medium", category: "Tree",
+    question: "Given the root of a binary tree, determine if it is a valid BST.",
+    solution: `class Solution {
+    public boolean isValidBST(TreeNode root) {
+        return validate(root, Long.MIN_VALUE, Long.MAX_VALUE);
+    }
+    private boolean validate(TreeNode n, long min, long max) {
+        if (n == null) return true;
+        if (n.val <= min || n.val >= max) return false;
+        return validate(n.left, min, n.val) && validate(n.right, n.val, max);
+    }
+}`, tc: "O(n)", sc: "O(h)"
+  },
+  {
+    num: 28, title: "Kth Smallest Element in a BST", difficulty: "Medium", category: "Tree",
+    question: "Find the k-th smallest element (1-indexed) in a BST.",
+    solution: `class Solution {
+    int k, res;
+    public int kthSmallest(TreeNode root, int k) {
+        this.k = k;
+        inorder(root);
+        return res;
+    }
+    private void inorder(TreeNode n) {
+        if (n == null) return;
+        inorder(n.left);
+        if (--k == 0) { res = n.val; return; }
+        inorder(n.right);
+    }
+}`, tc: "O(H+k)", sc: "O(H)"
+  },
+  {
+    num: 29, title: "Lowest Common Ancestor of BST", difficulty: "Easy", category: "Tree",
+    question: "Find the lowest common ancestor of two nodes in a BST.",
+    solution: `class Solution {
+    public TreeNode lowestCommonAncestor(TreeNode root, TreeNode p, TreeNode q) {
+        while (root != null) {
+            if   (p.val < root.val && q.val < root.val) root = root.left;
+            else if (p.val > root.val && q.val > root.val) root = root.right;
+            else return root;
+        }
+        return null;
+    }
+}`, tc: "O(H)", sc: "O(1)"
+  },
+  {
+    num: 30, title: "Binary Tree Maximum Path Sum", difficulty: "Hard", category: "Tree",
+    question: "Find the maximum path sum in a binary tree. The path may start and end at any node.",
+    solution: `class Solution {
+    int max = Integer.MIN_VALUE;
+    public int maxPathSum(TreeNode root) {
+        gain(root);
+        return max;
+    }
+    private int gain(TreeNode n) {
+        if (n == null) return 0;
+        int left  = Math.max(0, gain(n.left));
+        int right = Math.max(0, gain(n.right));
+        max = Math.max(max, n.val + left + right);
+        return n.val + Math.max(left, right);
+    }
+}`, tc: "O(n)", sc: "O(h)"
+  },
+  {
+    num: 31, title: "Serialize and Deserialize Binary Tree", difficulty: "Hard", category: "Tree",
+    question: "Design an algorithm to serialize a binary tree to a string and deserialize it back.",
+    solution: `public class Codec {
+    public String serialize(TreeNode root) {
+        if (root == null) return "null,";
+        return root.val + "," + serialize(root.left) + serialize(root.right);
+    }
+    Queue<String> q;
+    public TreeNode deserialize(String data) {
+        q = new LinkedList<>(Arrays.asList(data.split(",")));
+        return build();
+    }
+    private TreeNode build() {
+        String val = q.poll();
+        if ("null".equals(val)) return null;
+        TreeNode n = new TreeNode(Integer.parseInt(val));
+        n.left  = build();
+        n.right = build();
+        return n;
+    }
+}`, tc: "O(n)", sc: "O(n)"
+  },
+
+  // ── GRAPH ──────────────────────────────────────────────────────────────────
+  {
+    num: 32, title: "Number of Islands", difficulty: "Medium", category: "Graph",
+    question: "Given a 2D grid of '1' (land) and '0' (water), count the number of islands.",
+    solution: `class Solution {
+    public int numIslands(char[][] grid) {
+        int count = 0;
+        for (int r = 0; r < grid.length; r++)
+            for (int c = 0; c < grid[0].length; c++)
+                if (grid[r][c] == '1') { dfs(grid, r, c); count++; }
+        return count;
+    }
+    private void dfs(char[][] g, int r, int c) {
+        if (r<0||c<0||r>=g.length||c>=g[0].length||g[r][c]!='1') return;
+        g[r][c] = '0';
+        dfs(g,r+1,c); dfs(g,r-1,c); dfs(g,r,c+1); dfs(g,r,c-1);
+    }
+}`, tc: "O(m·n)", sc: "O(m·n)"
+  },
+  {
+    num: 33, title: "Clone Graph", difficulty: "Medium", category: "Graph",
+    question: "Return a deep copy of a connected undirected graph given a reference to one of its nodes.",
+    solution: `class Solution {
+    Map<Node,Node> visited = new HashMap<>();
+    public Node cloneGraph(Node node) {
+        if (node == null) return null;
+        if (visited.containsKey(node)) return visited.get(node);
+        Node clone = new Node(node.val);
+        visited.put(node, clone);
+        for (Node n : node.neighbors) clone.neighbors.add(cloneGraph(n));
+        return clone;
+    }
+}`, tc: "O(V+E)", sc: "O(V)"
+  },
+  {
+    num: 34, title: "Pacific Atlantic Water Flow", difficulty: "Medium", category: "Graph",
+    question: "Return all cells from which water can flow to both the Pacific and Atlantic oceans.",
+    solution: `class Solution {
+    int[][] dirs = {{1,0},{-1,0},{0,1},{0,-1}};
+    public List<List<Integer>> pacificAtlantic(int[][] h) {
+        int R = h.length, C = h[0].length;
+        boolean[][] pac = new boolean[R][C], atl = new boolean[R][C];
+        Queue<int[]> pq = new LinkedList<>(), aq = new LinkedList<>();
+        for (int r = 0; r < R; r++) { pq.offer(new int[]{r,0}); pac[r][0]=true; aq.offer(new int[]{r,C-1}); atl[r][C-1]=true; }
+        for (int c = 0; c < C; c++) { pq.offer(new int[]{0,c}); pac[0][c]=true; aq.offer(new int[]{R-1,c}); atl[R-1][c]=true; }
+        bfs(h,pq,pac); bfs(h,aq,atl);
+        List<List<Integer>> res = new ArrayList<>();
+        for (int r=0;r<R;r++) for (int c=0;c<C;c++) if (pac[r][c]&&atl[r][c]) res.add(Arrays.asList(r,c));
+        return res;
+    }
+    private void bfs(int[][] h, Queue<int[]> q, boolean[][] vis) {
+        while (!q.isEmpty()) {
+            int[] cell = q.poll();
+            for (int[] d : dirs) {
+                int nr=cell[0]+d[0], nc=cell[1]+d[1];
+                if (nr<0||nc<0||nr>=h.length||nc>=h[0].length||vis[nr][nc]||h[nr][nc]<h[cell[0]][cell[1]]) continue;
+                vis[nr][nc]=true; q.offer(new int[]{nr,nc});
+            }
+        }
+    }
+}`, tc: "O(m·n)", sc: "O(m·n)"
+  },
+  {
+    num: 35, title: "Course Schedule", difficulty: "Medium", category: "Graph",
+    question: "Given numCourses and prerequisites, determine if it is possible to finish all courses (cycle detection in a directed graph).",
+    solution: `class Solution {
+    public boolean canFinish(int n, int[][] prereqs) {
+        List<List<Integer>> adj = new ArrayList<>();
+        for (int i=0;i<n;i++) adj.add(new ArrayList<>());
+        for (int[] p : prereqs) adj.get(p[1]).add(p[0]);
+        int[] state = new int[n]; // 0=unvisited, 1=visiting, 2=done
+        for (int i=0;i<n;i++) if (hasCycle(adj, state, i)) return false;
+        return true;
+    }
+    private boolean hasCycle(List<List<Integer>> adj, int[] state, int u) {
+        if (state[u]==1) return true;
+        if (state[u]==2) return false;
+        state[u]=1;
+        for (int v : adj.get(u)) if (hasCycle(adj, state, v)) return true;
+        state[u]=2;
+        return false;
+    }
+}`, tc: "O(V+E)", sc: "O(V+E)"
+  },
+  {
+    num: 36, title: "Number of Connected Components in Undirected Graph", difficulty: "Medium", category: "Graph",
+    question: "Given n nodes and a list of undirected edges, return the number of connected components.",
+    solution: `class Solution {
+    public int countComponents(int n, int[][] edges) {
+        int[] parent = new int[n];
+        for (int i=0;i<n;i++) parent[i]=i;
+        int comps = n;
+        for (int[] e : edges) {
+            int pa = find(parent, e[0]), pb = find(parent, e[1]);
+            if (pa != pb) { parent[pa] = pb; comps--; }
+        }
+        return comps;
+    }
+    private int find(int[] p, int x) { return p[x]==x?x:(p[x]=find(p,p[x])); }
+}`, tc: "O(n·α(n))", sc: "O(n)"
+  },
+  {
+    num: 37, title: "Graph Valid Tree", difficulty: "Medium", category: "Graph",
+    question: "Given n nodes and edges, determine if they form a valid tree (connected, no cycle).",
+    solution: `class Solution {
+    public boolean validTree(int n, int[][] edges) {
+        if (edges.length != n - 1) return false;
+        int[] parent = new int[n];
+        for (int i=0;i<n;i++) parent[i]=i;
+        for (int[] e : edges) {
+            int pa = find(parent, e[0]), pb = find(parent, e[1]);
+            if (pa == pb) return false;
+            parent[pa] = pb;
+        }
+        return true;
+    }
+    private int find(int[] p, int x) { return p[x]==x?x:(p[x]=find(p,p[x])); }
+}`, tc: "O(n·α(n))", sc: "O(n)"
+  },
+  {
+    num: 38, title: "Alien Dictionary", difficulty: "Hard", category: "Graph",
+    question: "Given a sorted list of words from an alien language, derive the order of characters (topological sort).",
+    solution: `class Solution {
+    public String alienOrder(String[] words) {
+        Map<Character,Set<Character>> adj = new HashMap<>();
+        Map<Character,Integer> indegree = new HashMap<>();
+        for (String w : words) for (char c : w.toCharArray()) { adj.putIfAbsent(c,new HashSet<>()); indegree.putIfAbsent(c,0); }
+        for (int i=0;i<words.length-1;i++) {
+            String w1=words[i], w2=words[i+1];
+            if (w1.length()>w2.length()&&w1.startsWith(w2)) return "";
+            for (int j=0;j<Math.min(w1.length(),w2.length());j++) {
+                if (w1.charAt(j)!=w2.charAt(j)) { if (!adj.get(w1.charAt(j)).contains(w2.charAt(j))) { adj.get(w1.charAt(j)).add(w2.charAt(j)); indegree.merge(w2.charAt(j),1,Integer::sum); } break; }
+            }
+        }
+        Queue<Character> q = new LinkedList<>();
+        for (char c : indegree.keySet()) if (indegree.get(c)==0) q.offer(c);
+        StringBuilder sb = new StringBuilder();
+        while (!q.isEmpty()) {
+            char c = q.poll(); sb.append(c);
+            for (char next : adj.get(c)) if (indegree.merge(next,-1,Integer::sum)==0) q.offer(next);
+        }
+        return sb.length()==indegree.size()?sb.toString():"";
+    }
+}`, tc: "O(C)", sc: "O(1)"
+  },
+
+  // ── DYNAMIC PROGRAMMING ────────────────────────────────────────────────────
+  {
+    num: 39, title: "Climbing Stairs", difficulty: "Easy", category: "DP",
+    question: "Count the distinct ways to climb n stairs taking 1 or 2 steps at a time.",
+    solution: `class Solution {
+    public int climbStairs(int n) {
+        if (n <= 2) return n;
+        int a = 1, b = 2;
+        for (int i = 3; i <= n; i++) { int tmp = a+b; a=b; b=tmp; }
+        return b;
+    }
+}`, tc: "O(n)", sc: "O(1)"
+  },
+  {
+    num: 40, title: "Coin Change", difficulty: "Medium", category: "DP",
+    question: "Given coins of different denominations and amount, find the minimum number of coins to make up that amount.",
+    solution: `class Solution {
+    public int coinChange(int[] coins, int amount) {
+        int[] dp = new int[amount + 1];
+        Arrays.fill(dp, amount + 1);
+        dp[0] = 0;
+        for (int a = 1; a <= amount; a++)
+            for (int c : coins)
+                if (c <= a) dp[a] = Math.min(dp[a], dp[a-c] + 1);
+        return dp[amount] > amount ? -1 : dp[amount];
+    }
+}`, tc: "O(amount·n)", sc: "O(amount)"
+  },
+  {
+    num: 41, title: "Longest Increasing Subsequence", difficulty: "Medium", category: "DP",
+    question: "Return the length of the longest strictly increasing subsequence.",
+    solution: `class Solution {
+    public int lengthOfLIS(int[] nums) {
+        List<Integer> tails = new ArrayList<>();
+        for (int n : nums) {
+            int lo=0, hi=tails.size();
+            while (lo<hi) { int m=lo+(hi-lo)/2; if (tails.get(m)<n) lo=m+1; else hi=m; }
+            if (lo==tails.size()) tails.add(n);
+            else tails.set(lo, n);
+        }
+        return tails.size();
+    }
+}`, tc: "O(n log n)", sc: "O(n)"
+  },
+  {
+    num: 42, title: "Longest Common Subsequence", difficulty: "Medium", category: "DP",
+    question: "Return the length of the longest common subsequence between two strings.",
+    solution: `class Solution {
+    public int longestCommonSubsequence(String text1, String text2) {
+        int m=text1.length(), n=text2.length();
+        int[][] dp = new int[m+1][n+1];
+        for (int i=1;i<=m;i++)
+            for (int j=1;j<=n;j++)
+                if (text1.charAt(i-1)==text2.charAt(j-1)) dp[i][j]=dp[i-1][j-1]+1;
+                else dp[i][j]=Math.max(dp[i-1][j],dp[i][j-1]);
+        return dp[m][n];
+    }
+}`, tc: "O(m·n)", sc: "O(m·n)"
+  },
+  {
+    num: 43, title: "Word Break", difficulty: "Medium", category: "DP",
+    question: "Determine if string s can be segmented into a space-separated sequence of words from a dictionary.",
+    solution: `class Solution {
+    public boolean wordBreak(String s, List<String> wordDict) {
+        Set<String> dict = new HashSet<>(wordDict);
+        boolean[] dp = new boolean[s.length()+1];
+        dp[0] = true;
+        for (int i=1;i<=s.length();i++)
+            for (int j=0;j<i;j++)
+                if (dp[j] && dict.contains(s.substring(j,i))) { dp[i]=true; break; }
+        return dp[s.length()];
+    }
+}`, tc: "O(n²)", sc: "O(n)"
+  },
+  {
+    num: 44, title: "Combination Sum IV", difficulty: "Medium", category: "DP",
+    question: "Given an array of distinct integers and a target, return the number of possible combinations that add up to the target (order matters).",
+    solution: `class Solution {
+    public int combinationSum4(int[] nums, int target) {
+        int[] dp = new int[target + 1];
+        dp[0] = 1;
+        for (int t=1;t<=target;t++)
+            for (int n : nums)
+                if (n<=t) dp[t]+=dp[t-n];
+        return dp[target];
+    }
+}`, tc: "O(target·n)", sc: "O(target)"
+  },
+  {
+    num: 45, title: "House Robber", difficulty: "Medium", category: "DP",
+    question: "Given an array, find the maximum sum of non-adjacent elements (you cannot rob two adjacent houses).",
+    solution: `class Solution {
+    public int rob(int[] nums) {
+        int prev=0, curr=0;
+        for (int n : nums) { int tmp=Math.max(curr, prev+n); prev=curr; curr=tmp; }
+        return curr;
+    }
+}`, tc: "O(n)", sc: "O(1)"
+  },
+  {
+    num: 46, title: "House Robber II", difficulty: "Medium", category: "DP",
+    question: "Houses are arranged in a circle. Find the maximum sum of non-adjacent elements.",
+    solution: `class Solution {
+    public int rob(int[] nums) {
+        if (nums.length == 1) return nums[0];
+        return Math.max(rob(nums, 0, nums.length-2), rob(nums, 1, nums.length-1));
+    }
+    private int rob(int[] nums, int lo, int hi) {
+        int prev=0, curr=0;
+        for (int i=lo;i<=hi;i++) { int t=Math.max(curr, prev+nums[i]); prev=curr; curr=t; }
+        return curr;
+    }
+}`, tc: "O(n)", sc: "O(1)"
+  },
+  {
+    num: 47, title: "Decode Ways", difficulty: "Medium", category: "DP",
+    question: "A message encoded as digits can be decoded. Return the number of ways to decode the string.",
+    solution: `class Solution {
+    public int numDecodings(String s) {
+        int n=s.length();
+        int[] dp = new int[n+1];
+        dp[0]=1; dp[1]=s.charAt(0)=='0'?0:1;
+        for (int i=2;i<=n;i++) {
+            if (s.charAt(i-1)!='0') dp[i]+=dp[i-1];
+            int two=Integer.parseInt(s.substring(i-2,i));
+            if (two>=10&&two<=26) dp[i]+=dp[i-2];
+        }
+        return dp[n];
+    }
+}`, tc: "O(n)", sc: "O(n)"
+  },
+  {
+    num: 48, title: "Unique Paths", difficulty: "Medium", category: "DP",
+    question: "Count distinct paths from top-left to bottom-right of an m×n grid (only right or down moves allowed).",
+    solution: `class Solution {
+    public int uniquePaths(int m, int n) {
+        int[] dp = new int[n];
+        Arrays.fill(dp, 1);
+        for (int i=1;i<m;i++)
+            for (int j=1;j<n;j++)
+                dp[j]+=dp[j-1];
+        return dp[n-1];
+    }
+}`, tc: "O(m·n)", sc: "O(n)"
+  },
+  {
+    num: 49, title: "Jump Game", difficulty: "Medium", category: "DP",
+    question: "Given array of jump lengths, determine if you can reach the last index starting from index 0.",
+    solution: `class Solution {
+    public boolean canJump(int[] nums) {
+        int reach = 0;
+        for (int i=0;i<nums.length;i++) {
+            if (i > reach) return false;
+            reach = Math.max(reach, i + nums[i]);
+        }
+        return true;
+    }
+}`, tc: "O(n)", sc: "O(1)"
+  },
+
+  // ── LINKED LIST ────────────────────────────────────────────────────────────
+  {
+    num: 50, title: "Reverse Linked List", difficulty: "Easy", category: "LinkedList",
+    question: "Reverse a singly linked list.",
+    solution: `class Solution {
+    public ListNode reverseList(ListNode head) {
+        ListNode prev = null, cur = head;
+        while (cur != null) {
+            ListNode next = cur.next;
+            cur.next = prev;
+            prev = cur;
+            cur = next;
+        }
+        return prev;
+    }
+}`, tc: "O(n)", sc: "O(1)"
+  },
+  {
+    num: 51, title: "Linked List Cycle", difficulty: "Easy", category: "LinkedList",
+    question: "Given the head of a linked list, determine if it has a cycle.",
+    solution: `class Solution {
+    public boolean hasCycle(ListNode head) {
+        ListNode slow = head, fast = head;
+        while (fast != null && fast.next != null) {
+            slow = slow.next;
+            fast = fast.next.next;
+            if (slow == fast) return true;
+        }
+        return false;
+    }
+}`, tc: "O(n)", sc: "O(1)"
+  },
+  {
+    num: 52, title: "Merge Two Sorted Lists", difficulty: "Easy", category: "LinkedList",
+    question: "Merge two sorted linked lists and return the merged list.",
+    solution: `class Solution {
+    public ListNode mergeTwoLists(ListNode l1, ListNode l2) {
+        ListNode dummy = new ListNode(0), cur = dummy;
+        while (l1 != null && l2 != null) {
+            if (l1.val <= l2.val) { cur.next = l1; l1 = l1.next; }
+            else                  { cur.next = l2; l2 = l2.next; }
+            cur = cur.next;
+        }
+        cur.next = (l1 != null) ? l1 : l2;
+        return dummy.next;
+    }
+}`, tc: "O(n+m)", sc: "O(1)"
+  },
+  {
+    num: 53, title: "Remove Nth Node From End of List", difficulty: "Medium", category: "LinkedList",
+    question: "Remove the n-th node from the end of a linked list and return its head.",
+    solution: `class Solution {
+    public ListNode removeNthFromEnd(ListNode head, int n) {
+        ListNode dummy = new ListNode(0, head), fast = dummy, slow = dummy;
+        for (int i=0;i<=n;i++) fast = fast.next;
+        while (fast != null) { slow = slow.next; fast = fast.next; }
+        slow.next = slow.next.next;
+        return dummy.next;
+    }
+}`, tc: "O(n)", sc: "O(1)"
+  },
+  {
+    num: 54, title: "Reorder List", difficulty: "Medium", category: "LinkedList",
+    question: "Reorder L0→L1→…→Ln to L0→Ln→L1→Ln-1→…",
+    solution: `class Solution {
+    public void reorderList(ListNode head) {
+        // 1. Find middle
+        ListNode slow=head, fast=head;
+        while (fast.next!=null && fast.next.next!=null) { slow=slow.next; fast=fast.next.next; }
+        // 2. Reverse second half
+        ListNode prev=null, cur=slow.next; slow.next=null;
+        while (cur!=null) { ListNode t=cur.next; cur.next=prev; prev=cur; cur=t; }
+        // 3. Merge
+        ListNode first=head, second=prev;
+        while (second!=null) { ListNode t1=first.next, t2=second.next; first.next=second; second.next=t1; first=t1; second=t2; }
+    }
+}`, tc: "O(n)", sc: "O(1)"
+  },
+  {
+    num: 55, title: "Merge K Sorted Lists", difficulty: "Hard", category: "LinkedList",
+    question: "Merge k sorted linked lists and return the merged sorted list.",
+    solution: `class Solution {
+    public ListNode mergeKLists(ListNode[] lists) {
+        PriorityQueue<ListNode> pq = new PriorityQueue<>(Comparator.comparingInt(n -> n.val));
+        for (ListNode l : lists) if (l != null) pq.offer(l);
+        ListNode dummy = new ListNode(0), cur = dummy;
+        while (!pq.isEmpty()) {
+            cur.next = pq.poll();
+            cur = cur.next;
+            if (cur.next != null) pq.offer(cur.next);
+        }
+        return dummy.next;
+    }
+}`, tc: "O(n log k)", sc: "O(k)"
+  },
+
+  // ── INTERVAL ───────────────────────────────────────────────────────────────
+  {
+    num: 56, title: "Insert Interval", difficulty: "Medium", category: "Interval",
+    question: "Insert a new interval into a sorted list of non-overlapping intervals, merging if necessary.",
+    solution: `class Solution {
+    public int[][] insert(int[][] intervals, int[] newInterval) {
+        List<int[]> res = new ArrayList<>();
+        int i = 0, n = intervals.length;
+        while (i < n && intervals[i][1] < newInterval[0]) res.add(intervals[i++]);
+        while (i < n && intervals[i][0] <= newInterval[1]) {
+            newInterval[0] = Math.min(newInterval[0], intervals[i][0]);
+            newInterval[1] = Math.max(newInterval[1], intervals[i][1]);
+            i++;
+        }
+        res.add(newInterval);
+        while (i < n) res.add(intervals[i++]);
+        return res.toArray(new int[0][]);
+    }
+}`, tc: "O(n)", sc: "O(n)"
+  },
+  {
+    num: 57, title: "Merge Intervals", difficulty: "Medium", category: "Interval",
+    question: "Given a list of intervals, merge all overlapping intervals.",
+    solution: `class Solution {
+    public int[][] merge(int[][] intervals) {
+        Arrays.sort(intervals, (a,b)->a[0]-b[0]);
+        List<int[]> res = new ArrayList<>();
+        int[] cur = intervals[0];
+        for (int i=1;i<intervals.length;i++) {
+            if (intervals[i][0] <= cur[1]) cur[1]=Math.max(cur[1],intervals[i][1]);
+            else { res.add(cur); cur=intervals[i]; }
+        }
+        res.add(cur);
+        return res.toArray(new int[0][]);
+    }
+}`, tc: "O(n log n)", sc: "O(n)"
+  },
+  {
+    num: 58, title: "Non-overlapping Intervals", difficulty: "Medium", category: "Interval",
+    question: "Find the minimum number of intervals to remove to make the rest non-overlapping.",
+    solution: `class Solution {
+    public int eraseOverlapIntervals(int[][] intervals) {
+        Arrays.sort(intervals, (a,b)->a[1]-b[1]);
+        int count=0, end=Integer.MIN_VALUE;
+        for (int[] iv : intervals) {
+            if (iv[0] >= end) end = iv[1];
+            else count++;
+        }
+        return count;
+    }
+}`, tc: "O(n log n)", sc: "O(1)"
+  },
+  {
+    num: 59, title: "Meeting Rooms", difficulty: "Easy", category: "Interval",
+    question: "Given meeting time intervals, determine if a person can attend all meetings.",
+    solution: `class Solution {
+    public boolean canAttendMeetings(int[][] intervals) {
+        Arrays.sort(intervals, (a,b)->a[0]-b[0]);
+        for (int i=1;i<intervals.length;i++)
+            if (intervals[i][0] < intervals[i-1][1]) return false;
+        return true;
+    }
+}`, tc: "O(n log n)", sc: "O(1)"
+  },
+  {
+    num: 60, title: "Meeting Rooms II", difficulty: "Medium", category: "Interval",
+    question: "Find the minimum number of conference rooms required to hold all meetings.",
+    solution: `class Solution {
+    public int minMeetingRooms(int[][] intervals) {
+        int n=intervals.length;
+        int[] starts=new int[n], ends=new int[n];
+        for (int i=0;i<n;i++) { starts[i]=intervals[i][0]; ends[i]=intervals[i][1]; }
+        Arrays.sort(starts); Arrays.sort(ends);
+        int rooms=0, endIdx=0;
+        for (int s : starts) {
+            if (s < ends[endIdx]) rooms++;
+            else endIdx++;
+        }
+        return rooms;
+    }
+}`, tc: "O(n log n)", sc: "O(n)"
+  },
+
+  // ── MATRIX ─────────────────────────────────────────────────────────────────
+  {
+    num: 61, title: "Set Matrix Zeroes", difficulty: "Medium", category: "Matrix",
+    question: "If an element is 0, set its entire row and column to 0. Do it in-place.",
+    solution: `class Solution {
+    public void setZeroes(int[][] matrix) {
+        boolean firstRow=false, firstCol=false;
+        int R=matrix.length, C=matrix[0].length;
+        for (int c=0;c<C;c++) if (matrix[0][c]==0) firstRow=true;
+        for (int r=0;r<R;r++) if (matrix[r][0]==0) firstCol=true;
+        for (int r=1;r<R;r++) for (int c=1;c<C;c++) if (matrix[r][c]==0) { matrix[r][0]=0; matrix[0][c]=0; }
+        for (int r=1;r<R;r++) for (int c=1;c<C;c++) if (matrix[r][0]==0||matrix[0][c]==0) matrix[r][c]=0;
+        if (firstRow) Arrays.fill(matrix[0],0);
+        if (firstCol) for (int r=0;r<R;r++) matrix[r][0]=0;
+    }
+}`, tc: "O(m·n)", sc: "O(1)"
+  },
+  {
+    num: 62, title: "Spiral Matrix", difficulty: "Medium", category: "Matrix",
+    question: "Return all elements of an m×n matrix in spiral order.",
+    solution: `class Solution {
+    public List<Integer> spiralOrder(int[][] matrix) {
+        List<Integer> res = new ArrayList<>();
+        int top=0, bot=matrix.length-1, left=0, right=matrix[0].length-1;
+        while (top<=bot && left<=right) {
+            for (int c=left;c<=right;c++) res.add(matrix[top][c]); top++;
+            for (int r=top;r<=bot;r++) res.add(matrix[r][right]); right--;
+            if (top<=bot) for (int c=right;c>=left;c--) res.add(matrix[bot][c]); bot--;
+            if (left<=right) for (int r=bot;r>=top;r--) res.add(matrix[r][left]); left++;
+        }
+        return res;
+    }
+}`, tc: "O(m·n)", sc: "O(1)"
+  },
+  {
+    num: 63, title: "Rotate Image", difficulty: "Medium", category: "Matrix",
+    question: "Rotate an n×n matrix 90 degrees clockwise in-place.",
+    solution: `class Solution {
+    public void rotate(int[][] matrix) {
+        int n = matrix.length;
+        // Transpose
+        for (int i=0;i<n;i++) for (int j=i+1;j<n;j++) { int t=matrix[i][j]; matrix[i][j]=matrix[j][i]; matrix[j][i]=t; }
+        // Reverse each row
+        for (int[] row : matrix) {
+            int l=0, r=row.length-1;
+            while (l<r) { int t=row[l]; row[l++]=row[r]; row[r--]=t; }
+        }
+    }
+}`, tc: "O(n²)", sc: "O(1)"
+  },
+  {
+    num: 64, title: "Word Search", difficulty: "Medium", category: "Matrix",
+    question: "Given a 2D grid of characters and a word, return true if the word exists in the grid (adjacent cells, same cell not reused).",
+    solution: `class Solution {
+    public boolean exist(char[][] board, String word) {
+        int R=board.length, C=board[0].length;
+        for (int r=0;r<R;r++) for (int c=0;c<C;c++) if (dfs(board,word,r,c,0)) return true;
+        return false;
+    }
+    private boolean dfs(char[][] b, String w, int r, int c, int i) {
+        if (i==w.length()) return true;
+        if (r<0||c<0||r>=b.length||c>=b[0].length||b[r][c]!=w.charAt(i)) return false;
+        char tmp=b[r][c]; b[r][c]='#';
+        boolean found = dfs(b,w,r+1,c,i+1)||dfs(b,w,r-1,c,i+1)||dfs(b,w,r,c+1,i+1)||dfs(b,w,r,c-1,i+1);
+        b[r][c]=tmp;
+        return found;
+    }
+}`, tc: "O(m·n·4^L)", sc: "O(L)"
+  },
+
+  // ── HEAP ───────────────────────────────────────────────────────────────────
+  {
+    num: 65, title: "Top K Frequent Elements", difficulty: "Medium", category: "Heap",
+    question: "Given an integer array, return the k most frequent elements.",
+    solution: `class Solution {
+    public int[] topKFrequent(int[] nums, int k) {
+        Map<Integer,Integer> freq = new HashMap<>();
+        for (int n : nums) freq.merge(n, 1, Integer::sum);
+        PriorityQueue<Integer> pq = new PriorityQueue<>(Comparator.comparingInt(freq::get));
+        for (int n : freq.keySet()) {
+            pq.offer(n);
+            if (pq.size() > k) pq.poll();
+        }
+        int[] res = new int[k];
+        for (int i=k-1;i>=0;i--) res[i]=pq.poll();
+        return res;
+    }
+}`, tc: "O(n log k)", sc: "O(n)"
+  },
+  {
+    num: 66, title: "Find Median from Data Stream", difficulty: "Hard", category: "Heap",
+    question: "Design a data structure that supports adding numbers and finding the median in O(log n) / O(1).",
+    solution: `class MedianFinder {
+    PriorityQueue<Integer> small = new PriorityQueue<>(Collections.reverseOrder()); // max-heap
+    PriorityQueue<Integer> large = new PriorityQueue<>();                            // min-heap
+    public void addNum(int num) {
+        small.offer(num);
+        large.offer(small.poll());
+        if (large.size() > small.size()) small.offer(large.poll());
+    }
+    public double findMedian() {
+        return small.size() > large.size() ? small.peek() : (small.peek() + large.peek()) / 2.0;
+    }
+}`, tc: "O(log n) add, O(1) median", sc: "O(n)"
+  },
+
+  // ── BINARY / BIT MANIPULATION ──────────────────────────────────────────────
+  {
+    num: 67, title: "Sum of Two Integers", difficulty: "Medium", category: "Binary",
+    question: "Calculate the sum of two integers without using the + or - operators.",
+    solution: `class Solution {
+    public int getSum(int a, int b) {
+        while (b != 0) {
+            int carry = (a & b) << 1;
+            a = a ^ b;
+            b = carry;
+        }
+        return a;
+    }
+}`, tc: "O(1)", sc: "O(1)"
+  },
+  {
+    num: 68, title: "Number of 1 Bits", difficulty: "Easy", category: "Binary",
+    question: "Write a function that returns the number of '1' bits (Hamming weight) of a positive integer.",
+    solution: `class Solution {
+    public int hammingWeight(int n) {
+        int count = 0;
+        while (n != 0) { n &= (n - 1); count++; }
+        return count;
+    }
+}`, tc: "O(1)", sc: "O(1)"
+  },
+  {
+    num: 69, title: "Counting Bits", difficulty: "Easy", category: "Binary",
+    question: "For every number in [0, n], return an array count[i] = number of 1 bits.",
+    solution: `class Solution {
+    public int[] countBits(int n) {
+        int[] dp = new int[n + 1];
+        for (int i = 1; i <= n; i++) dp[i] = dp[i >> 1] + (i & 1);
+        return dp;
+    }
+}`, tc: "O(n)", sc: "O(n)"
+  },
+  {
+    num: 70, title: "Missing Number", difficulty: "Easy", category: "Binary",
+    question: "Given an array containing n distinct numbers in [0, n], find the missing number.",
+    solution: `class Solution {
+    public int missingNumber(int[] nums) {
+        int xor = nums.length;
+        for (int i = 0; i < nums.length; i++) xor ^= i ^ nums[i];
+        return xor;
+    }
+}`, tc: "O(n)", sc: "O(1)"
+  },
+  {
+    num: 71, title: "Reverse Bits", difficulty: "Easy", category: "Binary",
+    question: "Reverse the bits of a given 32-bit unsigned integer.",
+    solution: `class Solution {
+    public int reverseBits(int n) {
+        int res = 0;
+        for (int i = 0; i < 32; i++) {
+            res = (res << 1) | (n & 1);
+            n >>= 1;
+        }
+        return res;
+    }
+}`, tc: "O(1)", sc: "O(1)"
+  },
+
+  // ── ADDITIONAL (completing 75) ─────────────────────────────────────────────
+  {
+    num: 72, title: "Trie (Prefix Tree) – Implement", difficulty: "Medium", category: "Tree",
+    question: "Implement a Trie with <code>insert</code>, <code>search</code>, and <code>startsWith</code> methods.",
+    solution: `class Trie {
+    private TrieNode root = new TrieNode();
+    public void insert(String word) {
+        TrieNode cur = root;
+        for (char c : word.toCharArray()) {
+            cur.children.putIfAbsent(c, new TrieNode());
+            cur = cur.children.get(c);
+        }
+        cur.isEnd = true;
+    }
+    public boolean search(String word) {
+        TrieNode cur = root;
+        for (char c : word.toCharArray()) {
+            if (!cur.children.containsKey(c)) return false;
+            cur = cur.children.get(c);
+        }
+        return cur.isEnd;
+    }
+    public boolean startsWith(String prefix) {
+        TrieNode cur = root;
+        for (char c : prefix.toCharArray()) {
+            if (!cur.children.containsKey(c)) return false;
+            cur = cur.children.get(c);
+        }
+        return true;
+    }
+    class TrieNode {
+        Map<Character,TrieNode> children = new HashMap<>();
+        boolean isEnd = false;
+    }
+}`, tc: "O(L) per op", sc: "O(n·L)"
+  },
+  {
+    num: 73, title: "Design Add and Search Words Data Structure", difficulty: "Medium", category: "Tree",
+    question: "Implement a data structure that supports adding words and searching with '.' as wildcard.",
+    solution: `class WordDictionary {
+    TrieNode root = new TrieNode();
+    public void addWord(String word) {
+        TrieNode cur = root;
+        for (char c : word.toCharArray()) {
+            cur.children.putIfAbsent(c, new TrieNode());
+            cur = cur.children.get(c);
+        }
+        cur.isEnd = true;
+    }
+    public boolean search(String word) { return dfs(word, 0, root); }
+    private boolean dfs(String w, int i, TrieNode node) {
+        if (i == w.length()) return node.isEnd;
+        char c = w.charAt(i);
+        if (c == '.') {
+            for (TrieNode child : node.children.values())
+                if (dfs(w, i+1, child)) return true;
+            return false;
+        }
+        if (!node.children.containsKey(c)) return false;
+        return dfs(w, i+1, node.children.get(c));
+    }
+    class TrieNode { Map<Character,TrieNode> children = new HashMap<>(); boolean isEnd; }
+}`, tc: "O(L) add, O(26^L) worst search", sc: "O(n·L)"
+  },
+  {
+    num: 74, title: "Word Search II", difficulty: "Hard", category: "Matrix",
+    question: "Given a board and a list of words, find all words that exist in the board.",
+    solution: `class Solution {
+    public List<String> findWords(char[][] board, String[] words) {
+        TrieNode root = buildTrie(words);
+        Set<String> res = new HashSet<>();
+        for (int r=0;r<board.length;r++)
+            for (int c=0;c<board[0].length;c++)
+                dfs(board,r,c,root,res);
+        return new ArrayList<>(res);
+    }
+    private void dfs(char[][] b, int r, int c, TrieNode node, Set<String> res) {
+        if (r<0||c<0||r>=b.length||c>=b[0].length) return;
+        char ch=b[r][c];
+        if (ch=='#'||node.children[ch-'a']==null) return;
+        node=node.children[ch-'a'];
+        if (node.word!=null) res.add(node.word);
+        b[r][c]='#';
+        dfs(b,r+1,c,node,res); dfs(b,r-1,c,node,res);
+        dfs(b,r,c+1,node,res); dfs(b,r,c-1,node,res);
+        b[r][c]=ch;
+    }
+    private TrieNode buildTrie(String[] words) {
+        TrieNode root=new TrieNode();
+        for (String w:words) { TrieNode cur=root; for (char c:w.toCharArray()) { if (cur.children[c-'a']==null) cur.children[c-'a']=new TrieNode(); cur=cur.children[c-'a']; } cur.word=w; }
+        return root;
+    }
+    class TrieNode { TrieNode[] children=new TrieNode[26]; String word; }
+}`, tc: "O(m·n·4^L)", sc: "O(W·L)"
+  },
+  {
+    num: 75, title: "Longest Consecutive Sequence", difficulty: "Medium", category: "Array",
+    question: "Given an unsorted array of integers, find the length of the longest consecutive elements sequence in O(n) time.",
+    solution: `class Solution {
+    public int longestConsecutive(int[] nums) {
+        Set<Integer> set = new HashSet<>();
+        for (int n : nums) set.add(n);
+        int longest = 0;
+        for (int n : set) {
+            if (!set.contains(n - 1)) { // start of sequence
+                int len = 1;
+                while (set.contains(n + len)) len++;
+                longest = Math.max(longest, len);
+            }
+        }
+        return longest;
+    }
+}`, tc: "O(n)", sc: "O(n)"
+  }
+];
+
+let solved = JSON.parse(localStorage.getItem('blind75_solved') || '{}');
+let currentCategory = 'All';
+
+function renderCards() {
+  const grid = document.getElementById('cardGrid');
+  grid.innerHTML = '';
+  const filtered = currentCategory === 'All'
+    ? problems
+    : problems.filter(p => p.category === currentCategory);
+
+  filtered.forEach(p => {
+    const card = document.createElement('div');
+    card.className = 'card';
+    card.dataset.category = p.category;
+    const diffClass = 'badge-' + p.difficulty.toLowerCase();
+    const solvedClass = solved[p.num] ? 'done' : '';
+    card.innerHTML = `
+      <div class="card-header" onclick="toggleSolution(${p.num})">
+        <span class="card-num">#${p.num}</span>
+        <span class="card-title">${p.title}</span>
+        <span class="badge ${diffClass}">${p.difficulty}</span>
+        <span class="tag">${p.category}</span>
+      </div>
+      <div class="card-question">${p.question}</div>
+      <div class="card-actions">
+        <button class="btn-solution" onclick="toggleSolution(${p.num},event)">Show Solution</button>
+        <button class="btn-solved ${solvedClass}" id="solvedBtn_${p.num}" onclick="markSolved(${p.num},event)">
+          ${solved[p.num] ? '✓ Solved' : 'Mark Solved'}
+        </button>
+      </div>
+      <div class="solution-block" id="sol_${p.num}">
+        <h4>Java Solution</h4>
+        <pre>${escapeHtml(p.solution)}</pre>
+        <div class="complexity">
+          <span>Time: <b>${p.tc}</b></span>
+          <span>Space: <b>${p.sc}</b></span>
+        </div>
+      </div>`;
+    grid.appendChild(card);
+  });
+  updateProgress();
+}
+
+function escapeHtml(s) {
+  return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+function toggleSolution(num, e) {
+  if (e) e.stopPropagation();
+  const sol = document.getElementById('sol_' + num);
+  const btn = sol.previousElementSibling.querySelector('.btn-solution');
+  const isVisible = sol.classList.toggle('visible');
+  btn.textContent = isVisible ? 'Hide Solution' : 'Show Solution';
+}
+
+function markSolved(num, e) {
+  e.stopPropagation();
+  solved[num] = !solved[num];
+  localStorage.setItem('blind75_solved', JSON.stringify(solved));
+  const btn = document.getElementById('solvedBtn_' + num);
+  btn.textContent = solved[num] ? '✓ Solved' : 'Mark Solved';
+  btn.classList.toggle('done', !!solved[num]);
+  updateProgress();
+}
+
+function filterCategory(cat) {
+  currentCategory = cat;
+  document.querySelectorAll('.filter-btn').forEach(b => {
+    b.classList.toggle('active', b.textContent.trim() === cat ||
+      (cat === 'DP' && b.textContent.trim() === 'Dynamic Programming') ||
+      (cat === 'All' && b.textContent.trim() === 'All'));
+  });
+  renderCards();
+}
+
+function updateProgress() {
+  const total = problems.length;
+  const done = Object.values(solved).filter(Boolean).length;
+  document.getElementById('progressLabel').textContent = `${done} / ${total} solved`;
+  document.getElementById('progressFill').style.width = (done / total * 100) + '%';
+}
+
+renderCards();
+</script>
+</body>
+</html>
